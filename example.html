@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game</title>
+    <link href="https://fonts.googleapis.com/css?family=Rubik:300,400,500" rel="stylesheet" type="text/css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+
+        }
+
+        body {
+            font-family: "Avenir Next W01", "Proxima Nova W01", "Rubik", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 0.9rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #3E4B5B;
+            background-color: #fff;
+        }
+
+        button {
+            display: inline-block;
+            font-weight: 400;
+            line-height: 1.45;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            border: 2px solid transparent;
+            padding: 0.5rem 0.9rem;
+            font-size: 0.9rem;
+            border-radius: 0.25rem;
+            -webkit-transition: all 0.2s ease-in-out;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        input {
+            display: block;
+            width: 100px;
+            padding: 0.5rem 0.7rem;
+            font-size: 0.9rem;
+            line-height: 1.25;
+            color: #464a4c;
+            background-color: #fff;
+            background-image: none;
+            background-clip: padding-box;
+            border: 2px solid #dde2ec;
+            border-radius: 0.25rem;
+            -webkit-transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+            transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+            transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+            transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+        }
+
+        .matriz {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .row {
+            display: flex;
+        }
+
+        .item {
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            background-color: #ffffff;
+            border: 1px solid #eeeeee;
+            cursor: pointer;
+        }
+        .number {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid transparent;
+        }
+        .item.check {
+            width: 30px;
+            height: 30px;
+            background-color: #eeeeee;
+        }
+        .wall {
+            background-color: black;
+        }
+
+        button.active,
+        .start,
+        .start-btn {
+            background-color: #FEB139;
+            color: #ffffff;
+        }
+
+        button.end,
+        .end,
+        .end-btn {
+            background-color: #e65252;
+            color: #ffffff;
+        }
+
+        button.wall,
+        .wall,
+        .wall-btn {
+            background-color: #24A19C;
+            color: #ffffff;
+        }
+
+        button.render {
+            background-color: #047bf8;
+            color: #ffffff;
+        }
+
+        button.bfs {
+            background-color: #B91646;
+            color: #ffffff;
+        }
+        button.bfs:disabled {
+            opacity: .5;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+
+        .tour {
+            background-color: #ccccccb5;
+        }
+
+        .destination_route {
+            background-color: #B91646;
+        }
+        .main {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 800px;
+            margin: 0 auto;
+        }
+        .main .title {
+            font-size: 2rem;
+            margin: 30px;
+        }
+        .content {
+            display: flex;
+            background-color: rgb(238 238 238 / 50%);
+            box-shadow: 0px 2px 4px rgb(126 142 177 / 12%);
+            padding: 50px 20px;
+        }
+
+        .draw {
+            width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .draw .actions {
+            display: flex;
+        }
+
+        .inline {
+            display: flex;
+        }
+
+        .field {
+            margin: 10px;
+        }
+
+        .data {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: auto;
+            padding-top: 30px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div class="main">
+        <h2 class="title">(BFS) Búsqueda por anchura</h2>
+        <div class="content">
+            <div class="draw">
+                <div class="matriz" id="matriz"></div>
+                <div class="actions" v-if="showAction">
+                    <button @click="markStart" :class="{ 'start-btn': start }">Marcar Inicio</button>
+                    <button @click="markEnd" :class="{ 'end-btn': end }">Marcar Objetivo</button>
+                    <button @click="markObs" :class="{ 'wall-btn    ': !start && !end && btn_obs }">Agregar Obstáculo</button>
+                </div>
+            </div>
+            <div>
+                <div class="form">
+                    <div class="inline">
+                        <div class="field">
+                            <label for="size_x">Tamaño X</label>
+                            <input type="number" v-model="size_x">
+                        </div>
+                        <div class="field">
+                            <label for="size_x">Tamaño Y</label>
+                            <input type="number" v-model="size_y">
+                        </div>
+                    </div>
+                    <button @click="renderMatriz" class="render w-100">
+                        {{ resolveTextRender }}
+                    </button>
+                </div>
+                <div class="data">
+                    <p>Inicio: {{ start_maze }}</p>
+                    <p>Llegada: {{ end_maze }}</p>
+                    <button @click="bfs" class="bfs" :disabled="isEnable">Iniciar búsqueda</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/vue@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/party-js@latest/bundle/party.min.js"></script>
+
+
+<script type="importmap">
+      {
+        "imports": {
+          "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+        }
+      }
+
+</script>
+
+
+<script type="module">
+
+    /**
+     * Node de almacenamiento de una coordenada en x(i), y(j) y su padre (n)
+     */
+    class Node {
+        constructor(i, j, n) {
+            this.i = i;
+            this.j = j;
+            this.n = n;
+        }
+    }
+
+    /**
+     * Cola de funcionamiento
+     * @constructor
+     */
+    function ArrayQueue() {
+        let arr = [];
+        /**
+         * Agregamos elementos a la cola
+         * @param element: elemento a agregar
+         * @returns {boolean}: true si se agregó correctamente
+         */
+        this.push = function (element) {
+            arr.push(element);
+            return true;
+        }
+        /**
+         * Quitamos el pimer elemento de la cola
+         * @returns {*}: elemento en la primera posición
+         */
+        this.pop = function () {
+            return arr.shift();
+        }
+        /**
+         * Retorna el tamaño de la cola
+         * @returns {number}: entero
+         */
+        this.size = function () {
+            return arr.length;
+        }
+    }
+
+
+    import {createApp} from 'vue'
+
+    createApp({
+        // delimiters: ['${', '}'],
+        data() {
+            return {
+                size_x: 10,
+                size_y: 10,
+                start: true,
+                end: false,
+                maze: [[]],
+                start_maze: [],
+                end_maze: [],
+                mark: [],
+                move: [ // Posiciones posibles
+                    [0, 0],
+                    [0, 1],
+                    [1, 0],
+                    [0, -1],
+                    [-1, 0]
+                ],
+                max_size: 450,
+                btn_bfs: true,
+                btn_obs: true,
+                size_node: 0,
+            }
+        },
+        created() {
+            window.markWall = this.markWall;
+        },
+        mounted() {
+            this.renderMatriz()
+        },
+        computed: {
+            isEnable() {
+                return !(this.size_x > 0 && this.size_y > 0 &&
+                    this.start_maze.length > 0 && this.end_maze.length > 0 && this.btn_bfs === true);
+            },
+            showAction() {
+                return this.btn_bfs === true;
+            },
+            resolveTextRender() {
+                return this.btn_bfs === false ? 'Reiniciar matriz' : 'Renderizar matriz';
+            }
+        },
+        methods: {
+            /**
+             * Creamos matriz representativa
+             */
+            renderMatriz() {
+                let matriz = document.getElementById('matriz');
+                let html = '';
+                this.maze = [[]]
+                this.start_maze = []
+                this.end_maze = []
+                this.mark = []
+                this.btn_bfs = true;
+
+                this.size_node = this.max_size / this.size_x
+                for (let i = 0; i < (this.size_x + 2); i++) {
+                    let item_html = `
+                        <div class="row">
+                    `;
+                    this.maze[i] = []
+                    for (let j = 0; j < (this.size_y + 2); j++) {
+                        if (i === 0 || i === this.size_x + 1) {
+                            this.maze[i][j] = 1;
+                            if (i===0 && j > 0 &&  j < (this.size_y+1)) {
+                                item_html += `
+                                <div class="number"
+                                style="width: ${this.size_node}px;height: ${this.size_node}px">${j}</div>
+                            `;
+                            } else {
+                                item_html += `
+                                <div class=""
+                                style="width: ${this.size_node}px;height: ${this.size_node}px"></div>
+                            `;
+                            }
+                        } else if (j === 0 || j === this.size_y + 1) {
+                            this.maze[i][j] = 1;
+                            if (j===0) {
+                                item_html += `
+                                <div class="number"
+                                style="width: ${this.size_node}px;height: ${this.size_node}px">${i}</div>
+                            `;
+                            }
+
+                        } else {
+                            this.maze[i][j] = 0
+                            item_html += `
+                                <div onclick="markWall(${i}, ${j})" class="item" id="${i}-${j}"
+                                style="width: ${this.size_node}px;height: ${this.size_node}px"></div>
+                            `;
+                        }
+
+
+                    }
+                    item_html += `</div>`;
+                    html += item_html;
+                }
+                matriz.innerHTML = html;
+            },
+            /**
+             * Funcion para marcar las casillas que serán obstáculos para el camino a recorrer
+             * @param i: posición file
+             * @param j: posición columna
+             */
+            markWall(i, j) {
+                let c = 'wall'
+
+                if(this.start || this.end) {
+                    let elem = this.start ? "posición inicio" : "posición final"
+                    if(this.maze[i][j] === 1) {
+                        alert("No puedes colocar " + elem + " en un obstáculo")
+                        return;
+                    }
+                }
+
+                if (this.start) {
+                    c = 'start'
+                    this.start_maze = [i, j]
+                    this.removeClass(c)
+                } else if (this.end) {
+                    c = 'end'
+                    this.removeClass(c)
+                    this.end_maze = [i, j]
+                } else if(this.btn_obs) {
+                    if (this.start_maze[0] === i && this.start_maze[1] === j) {
+                        alert("No puedes colocar un obstáculo en la posición de inicio")
+                        return
+                    }
+                    if (this.end_maze[0] === i && this.end_maze[1] === j) {
+                        alert("No puedes colocar un obstáculo en la posición de objetivo")
+                        return
+                    }
+                } else {
+                    return;
+                }
+                let element = document.getElementById(`${i}-${j}`)
+                element.classList.toggle(c)
+
+                if (c !== 'wall') {
+                    if (element.classList.contains('wall')) {
+                        element.classList.remove('wall')
+                    }
+                } else {
+                    if (element.classList.contains('start') ||
+                        element.classList.contains('end')) {
+                        element.classList.remove('start')
+                        element.classList.remove('end')
+                    }
+                    this.maze[i][j] = this.maze[i][j] === 0 ? 1 : 0;
+                }
+
+            },
+            /**
+             * Se usa para marcar que indicaré cual es la posición de inicio
+             */
+            markStart() {
+                if (!this.start) {
+                    this.end = false;
+                    this.start = true;
+                }
+            },
+
+            /**
+             * Se usa para marcar que indicaré cual es la posición de final
+             */
+            markEnd() {
+                if (!this.end) {
+                    this.start = false;
+                    this.end = true;
+                }
+            },
+
+            /**
+             * Se usa para marcar que indicaré los obstáculos
+             */
+            markObs() {
+                this.start = false;
+                this.end = false;
+                this.btn_obs = true;
+            },
+
+            /**
+             * Busca y remueve las posibles clases de los elementos
+             */
+            removeClass(cls) {
+                // Busca los elementos correspondientes a la clase recibida
+                let x = document.getElementsByClassName(cls);
+
+                // Itera sobre cada uno de los elementos encontrados y remueve su clase
+                if (x.length > 0) {
+                    x[0].classList.remove(cls);
+                }
+            },
+            /**
+             * Creamos una copia para marcar las posiciones visitadas
+             */
+            remark() {
+                for (let x = 0; x < (this.size_x + 2); x++) {
+                    this.mark[x] = []; //
+                    for (let y = 0; y < (this.size_y + 2); y++) {
+                        this.mark[x][y] = 0;
+                    }
+                }
+
+            },
+            /**
+             * BFS (Breadth-First-Search "Búsqueda primero en amplitud") algoritmo
+             */
+            bfs() {
+                this.remark()
+
+                let queue = new ArrayQueue();
+                queue.push(new Node(this.start_maze[0], this.start_maze[1], null));
+                this.start = false;
+                this.end = false;
+                this.btn_obs = false;
+                let found = false;
+                let end_m = this.end_maze
+                let maze_temp = this.maze
+                let mark_temp = this.mark
+                let move_temp = this.move
+
+                let interval = window.setInterval(function () {
+                    let parent = queue.pop()
+                    document.getElementById(`${parent.i}-${parent.j}`).classList.add('tour')
+
+                    if (parent.i === end_m[0] && parent.j === end_m[1]) {
+                        let nodeParent = parent;
+                        found = true;
+                        while (nodeParent != null) {
+                            // Pintamos ruta a partir de los nodos padre
+                            document.getElementById(nodeParent.i + "-" + nodeParent.j).classList.add('destination_route')
+                            nodeParent = nodeParent.n;
+                        }
+                        clearInterval(interval)
+
+                        let el = document.getElementById('matriz')
+                        party.confetti(el, {
+                            shapes: ["square", "rectangle", "roundedSquare", "circle", "roundedRectangle", "star"],
+                            gravity: 800000,
+                        });
+                        let limit = 5;
+                        let st = 1;
+                        let i = window.setInterval(() => {
+                            party.confetti(el, {
+                                shapes: ["square", "rectangle", "roundedSquare", "circle", "roundedRectangle", "star"],
+                                gravity: 50,
+                            });
+                            if(limit === st) {
+                                clearInterval(i)
+                            }
+                            st += 1
+                        }, 140)
+
+                    }
+                    for (let v = 1; v <= 4; v++) {
+                        let g = parent.i + move_temp[v][0];
+                        let h = parent.j + move_temp[v][1];
+                        // Buscamos valores = 0, indicativas de camino, 1=obstáculo
+                        if (maze_temp[g][h] === 0 && mark_temp[g][h] === 0) {
+                            queue.push(new Node(g, h, parent));
+                            mark_temp[g][h] = 1;
+                        }
+                    }
+
+                    if (queue.size() <= 0) {
+                        if (!found) {
+                            alert("No se encontró ninguna salida");
+                            clearInterval(interval)
+                        }
+                    }
+                }, 50);
+
+                this.btn_bfs = false;
+            }
+
+        }
+    }).mount('#app')
+</script>
+
+</body>
+</html>
