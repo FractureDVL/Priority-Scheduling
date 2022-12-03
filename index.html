@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,13 +11,19 @@
     <link href="https://fonts.googleapis.com/css?family=Rubik:300,400,500" rel="stylesheet" type="text/css">
     <link rel="shortcut icon" href="https://upload.wikimedia.org/wikipedia/commons/9/95/Vue.js_Logo_2.svg"
         type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+        integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>Prority Scheduling</title>
 </head>
+
 <body>
     <header class="header">
         <h1 class="title page-title">Prority Scheduling</h1>
+
     </header>
     <div id="app" class="cont">
+
         <div class="child">
             <h1 class="title" v-on:click="showData()">Procesos en cola</h1>
             <table class="table" id="table">
@@ -35,38 +42,33 @@
                                 v-on:keyup.enter="edit(proceso.id)"></td>
                     </tr>
                     <!--Nuevos procesos-->
+                    <div class="big-button" v-on:click.prevent="add()">
+                        <i class="fa fa-plus" aria-hidden="true">
+                        </i>
+                    </div>
                 </tbody>
-                <tr class="newProcess">
-                        <td>
-                            {{nuevo.id}}
-                        </td>
-                        <td>
-                            <input class="input-new" type="number" placeholder="Prioridad">
-                        </td>
-                        <td>
-                            <input class="input-new" type="number" placeholder="Tiempo">
-                        </td>
-                        <td>
-                            <input class="input-new" type="number" placeholder="Llegada">
-                        </td>
-                </tr>
-                <tr>
-                    <td colspan="4">
-                        <div class="btn" v-on:click="add()">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-plus-square-fill"
-                                viewBox="0 0 16 16">
-                                <path
-                                    d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0z" />
-                            </svg>
-                        </div>
+                <tr class="newProcess noActive">
+                    <td>
+                        {{nuevo.id}}
                     </td>
-                </tr>
-            </table>
+                    <td>
+                        <input class="input-new" type="number" placeholder="Prioridad" required>
+                    </td>
+                    <td>
+                        <input class="input-new" type="number" placeholder="Tiempo" required>
+                    </td>
+                    <td>
+                        <input class="input-new" type="number" placeholder="Llegada" required>
+                    </td>
         </div>
-        <!--Gannt chart-->
-        <div class="child gannt"></div>
+        </tr>
+        </table>
+    </div>
+    <!--Gannt chart-->
+    <div class="child gannt"></div>
     </div>
     <script src="https://unpkg.com/vue@next"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         const app = Vue.createApp({
             data() {
@@ -109,22 +111,57 @@
                     },
 
                     running: false,
-                    editing: false
+                    editing: false,
+                    show: false
                 };
             },
             methods: {
                 showData() {
 
                 },
+                valid(arr) {
+                    var number = /[0-9]*/
+                    valid = true;
+                    for (let i = 0; i < arr.length; i++) {
+                        if (!(number.test(arr[0]) && arr[0] != '')) {
+                            valid = false;
+                        }
+                    }
+                    return valid;
+                },
                 add() {
-                    const nuevo = document.querySelectorAll('tr.newProcess input');
-                    const p = {
-                        id:'PN',
-                        llegada: nuevo[2].valueAsNumber,
-                        tiempo: nuevo[1].valueAsNumber,
-                        prioridad: nuevo[0].valueAsNumber
+                    var nuevo = document.querySelectorAll('tr.newProcess input');
+                    if (this.show) {
+                        document.querySelector('tr.newProcess').classList.replace('isActive', 'noActive');
+                        this.show = false;
+                    }
+                    if(!(this.show)){
+                        document.querySelector('tr.newProcess').classList.replace('noActive', 'isActive')
+                        this.show = true;
                     };
-                    nuevo.values = ''; 
+
+
+                    var nproc = [nuevo[0].value, nuevo[0].value, nuevo[0].value];
+                    if (this.valid(nproc)) {
+                        var p = {
+                            id: 'PN',
+                            llegada: nuevo[2].valueAsNumber,
+                            tiempo: nuevo[1].valueAsNumber,
+                            prioridad: nuevo[0].valueAsNumber
+                        };
+                    }
+
+                    else {
+                        Swal.fire({
+                            icon: '',
+                            title: 'Oops...',
+                            text: 'Rellene todos los campos.',
+                        })
+                    }
+                    nuevo[0].value = '';
+                    nuevo[1].value = '';
+                    nuevo[2].value = '';
+
                     console.log(p);
                     this.procesos.push(p);
                 }
