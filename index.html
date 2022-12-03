@@ -9,14 +9,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css?family=Rubik:300,400,500" rel="stylesheet" type="text/css">
-
+    <link rel="shortcut icon" href="https://upload.wikimedia.org/wikipedia/commons/9/95/Vue.js_Logo_2.svg"
+        type="image/x-icon">
     <title>Prority Scheduling</title>
 </head>
 
 <body>
+    <header class="header">
+        <h1 class="title page-title">Prority Scheduling</h1>
+    </header>
     <div id="app" class="cont">
         <div class="child">
-            <h1 class="title">Procesos en cola</h1>
+            <h1 class="title" v-on:click="showData()">Procesos en cola</h1>
             <table class="table" id="table">
                 <thead>
                     <th>Id proceso</th>
@@ -24,33 +28,105 @@
                     <th>Tiempo(ms)</th>
                     <th>Llegada</th>
                 </thead>
-                <tbody>
-                    <tr v-for = "proceso in procesos">
-                        <td>{{ proceso.id }}</td>
-                        <td>{{ proceso.prioridad }}</td>
-                        <td>{{ proceso.tiempo }}</td>
-                        <td>{{ proceso.llegada }}</td>
+                <tbody id="datat">
+                    <tr v-for="proceso in procesos">
+                        <td><input type="text" v-bind:value="proceso.id" readonly></td>
+                        <td><input v-bind:id="proceso.id" type="number" v-bind:value="proceso.prioridad"></td>
+                        <td><input v-bind:id="proceso.tiempo" type="number" v-bind:value="proceso.tiempo"></td>
+                        <td><input v-bind:id="proceso.llegada" type="number" v-bind:value="proceso.llegada"
+                                v-on:keyup.enter="edit(proceso.id)"></td>
                     </tr>
                     <!--Nuevos procesos-->
-                    <tr>
-                        <td colspan="4">
-                            <div class="btn" onclick="addRow()">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                                    class="bi bi-plus-square-fill" viewBox="0 0 16 16">
-                                    <path
-                                        d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0z" />
-                                </svg>
-                            </div>
-                        </td>
-                    </tr>
                 </tbody>
+                <tr class="newProcess">
+                        <td>
+                            {{nuevo.id}}
+                        </td>
+                        <td>
+                            <input class="input-new" type="number" v-model="nuevo.prioridad" placeholder="Prioridad">
+                        </td>
+                        <td>
+                            <input class="input-new" type="number" v-model="nuevo.tiempo" placeholder="Tiempo">
+                        </td>
+                        <td>
+                            <input class="input-new" type="number" v-model="nuevo.llegada" placeholder="Llegada">
+                        </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <div class="btn" v-on:click="add()">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-plus-square-fill"
+                                viewBox="0 0 16 16">
+                                <path
+                                    d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0z" />
+                            </svg>
+                        </div>
+                    </td>
+                </tr>
             </table>
         </div>
         <!--Gannt chart-->
-        <div class="child"></div>
+        <div class="child gannt"></div>
     </div>
     <script src="https://unpkg.com/vue@next"></script>
-    <script src="app.js"></script>
+    <script>
+        const app = Vue.createApp({
+            data() {
+                var c = procesos.length;
+                return {
+                    procesos: [{
+                        id: "P1",
+                        llegada: 1,
+                        tiempo: 3,
+                        prioridad: 2
+                    },
+                    {
+                        id: "P2",
+                        llegada: 3,
+                        tiempo: 3,
+                        prioridad: 4
+                    },
+                    {
+                        id: "P3",
+                        llegada: 3,
+                        tiempo: 3,
+                        prioridad: 1
+                    },
+                    {
+                        id: "P4",
+                        llegada: 3,
+                        tiempo: 2,
+                        prioridad: 4
+                    },
+                    {
+                        id: "P5",
+                        llegada: 3,
+                        tiempo: 2,
+                        prioridad: 3
+                    }],
+                    nuevo: {
+                        id: "P"+ c,
+                        llegada: null,
+                        tiempo: null,
+                        prioridad: null
+                    },
+
+                    running: false,
+                    editing: false
+                };
+            },
+            methods: {
+                showData() {
+
+                },
+                add() {
+                    console.log(this.procesos.length);
+                    this.procesos.push({ id: "P" + (this.procesos.length + 1) })
+                }
+            }
+        });
+        app.mount("#app");
+    </script>
 </body>
 
 </html>
