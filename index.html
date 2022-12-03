@@ -41,13 +41,13 @@
                             {{nuevo.id}}
                         </td>
                         <td>
-                            <input class="input-new" type="number" v-model="nuevo.prioridad" placeholder="Prioridad">
+                            <input class="input-new" type="number" placeholder="Prioridad">
                         </td>
                         <td>
-                            <input class="input-new" type="number" v-model="nuevo.tiempo" placeholder="Tiempo">
+                            <input class="input-new" type="number" placeholder="Tiempo">
                         </td>
                         <td>
-                            <input class="input-new" type="number" v-model="nuevo.llegada" placeholder="Llegada">
+                            <input class="input-new" type="number" placeholder="Llegada">
                         </td>
                 </tr>
                 <tr>
@@ -117,8 +117,16 @@
 
                 },
                 add() {
-                    console.log(this.procesos.length);
-                    this.procesos.push({ id: "P" + (this.procesos.length + 1) })
+                    const nuevo = document.querySelectorAll('tr.newProcess input');
+                    const p = {
+                        id:'PN',
+                        llegada: nuevo[2].valueAsNumber,
+                        tiempo: nuevo[1].valueAsNumber,
+                        prioridad: nuevo[0].valueAsNumber
+                    };
+                    nuevo.values = ''; 
+                    console.log(p);
+                    this.procesos.push(p);
                 }
             }
         });
