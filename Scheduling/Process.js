@@ -1,4 +1,5 @@
 const procesos = [];
+
 class Process {
     constructor(id, llegada, tiempo, prioridad) {
         this.id = id;
@@ -7,6 +8,7 @@ class Process {
         this.prioridad = prioridad;
     }
 }
+
 function addProcess(proceso){
     procesos.push(proceso);
 }

@@ -19,108 +19,83 @@
 
 <body>
     <header class="header">
-        <h1 class="title page-title">Prority Scheduling</h1>
-
+        <h1 class="title page-title">Programación prioritaria</h1>
     </header>
     <div id="app" class="cont">
-
         <div class="child">
             <h1 class="title" v-on:click="showData()">Procesos en cola</h1>
-            <table class="table" id="table">
-                <thead>
-                    <th>Id proceso</th>
-                    <th>Prioridad</th>
-                    <th>Tiempo(ms)</th>
-                    <th>Llegada</th>
-                </thead>
-                <tbody id="datat">
-                    <tr v-for="proceso in procesos">
-                        <td><input type="text" v-bind:value="proceso.id" readonly></td>
-                        <td><input v-bind:id="proceso.id" type="number" v-bind:value="proceso.prioridad"></td>
-                        <td><input v-bind:id="proceso.tiempo" type="number" v-bind:value="proceso.tiempo"></td>
-                        <td><input v-bind:id="proceso.llegada" type="number" v-bind:value="proceso.llegada"
-                                v-on:keyup.enter="edit(proceso.id)"></td>
-                    </tr>
-                    <!--Nuevos procesos-->
-                    <div class="big-button" v-on:click.prevent="add()">
-                        <i class="fa fa-plus" aria-hidden="true">
-                        </i>
-                    </div>
-                </tbody>
-                <tr class="newProcess noActive">
-                    <td>
-                        {{nuevo.id}}
-                    </td>
-                    <td>
-                        <input class="input-new" type="number" placeholder="Prioridad" required>
-                    </td>
-                    <td>
-                        <input class="input-new" type="number" placeholder="Tiempo" required>
-                    </td>
-                    <td>
-                        <input class="input-new" type="number" placeholder="Llegada" required>
-                    </td>
+            <div class="table-container">
+                <table class="table" id="table">
+                    <thead>
+                        <th>Id proceso</th>
+                        <th>Prioridad</th>
+                        <th>Tiempo(ms)</th>
+                        <th>Llegada</th>
+                    </thead>
+                    <tbody id="datat">
+                        <tr v-for="proceso in procesos">
+                            <td><input type="text" v-bind:value="proceso.id" readonly></td>
+                            <td><input v-bind:id="proceso.id" type="number" v-bind:value="proceso.prioridad"></td>
+                            <td><input v-bind:id="proceso.tiempo" type="number" v-bind:value="proceso.tiempo"></td>
+                            <td><input v-bind:id="proceso.llegada" type="number" v-bind:value="proceso.llegada"
+                                    v-on:keyup.enter="edit(proceso.id)"></td>
+                        </tr>
+                        <!--Nuevos procesos-->
+                        <tr class="newProcess" v-if="show || this.procesos != null">
+                            <td><input class="input" type="text" v-bind:placeholder="newId" readonly></td>
+                            <td><input class="input-new" type="number" placeholder="Prioridad" required></td>
+                            <td><input class="input-new" type="number" placeholder="Tiempo" required></td>
+                            <td><input class="input-new" type="number" placeholder="Llegada" required></td>
+                        </tr>
+                    </tbody>
+
+                </table>
+                <div class="big-button" v-on:click.prevent="add()">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                </div>
+            </div>
         </div>
-        </tr>
-        </table>
-    </div>
-    <!--Gannt chart-->
-    <div class="child gannt"></div>
+        <!--Gannt chart-->
+        <div class="child gannt"></div>
     </div>
     <script src="https://unpkg.com/vue@next"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        class Proceso {
+            constructor(id, llegada, tiempo, prioridad) {
+                this.id = id;
+                this.llegada = llegada;
+                this.tiempo = tiempo;
+                this.prioridad = prioridad;
+            }
+        }
         const app = Vue.createApp({
             data() {
                 return {
-                    procesos: [{
-                        id: "P1",
-                        llegada: 1,
-                        tiempo: 3,
-                        prioridad: 2
-                    },
-                    {
-                        id: "P2",
-                        llegada: 3,
-                        tiempo: 3,
-                        prioridad: 4
-                    },
-                    {
-                        id: "P3",
-                        llegada: 3,
-                        tiempo: 3,
-                        prioridad: 1
-                    },
-                    {
-                        id: "P4",
-                        llegada: 3,
-                        tiempo: 2,
-                        prioridad: 4
-                    },
-                    {
-                        id: "P5",
-                        llegada: 3,
-                        tiempo: 2,
-                        prioridad: 3
-                    }],
+                    procesos: [],
                     nuevo: {
-                        id: "P",
                         llegada: null,
                         tiempo: null,
-                        prioridad: null
+                        prioridad: null,
+                        stoped: null,
+                        running: null,
+                        finished: null
                     },
-
                     running: false,
                     editing: false,
                     show: false
                 };
             },
+            computed: {
+                //Generador para el proximo id
+                newId: function name(params) {
+                    return `P${this.procesos.length + 1}`;
+                }
+            },
             methods: {
-                showData() {
-
-                },
+                //Valida los datos de entrada en los campos
                 valid(arr) {
-                    var number = /[0-9]*/
+                    var number = /[0-9]*/;
                     valid = true;
                     for (let i = 0; i < arr.length; i++) {
                         if (!(number.test(arr[0]) && arr[0] != '')) {
@@ -129,28 +104,21 @@
                     }
                     return valid;
                 },
+                //Agrega una fila con nuevo un nuevo procesos
                 add() {
-                    var nuevo = document.querySelectorAll('tr.newProcess input');
-                    if (this.show) {
-                        document.querySelector('tr.newProcess').classList.replace('isActive', 'noActive');
-                        this.show = false;
-                    }
-                    if(!(this.show)){
-                        document.querySelector('tr.newProcess').classList.replace('noActive', 'isActive')
-                        this.show = true;
-                    };
+                    var nuevo = document.querySelectorAll('tr.newProcess input.input-new');
+                    this.show = this.show ? '' : this.show = true;
+                    var nproc = [nuevo[0].value, nuevo[1].value, nuevo[2].value];
 
-
-                    var nproc = [nuevo[0].value, nuevo[0].value, nuevo[0].value];
                     if (this.valid(nproc)) {
                         var p = {
-                            id: 'PN',
+                            id: this.newId,
+                            prioridad: nuevo[0].valueAsNumber,
                             llegada: nuevo[2].valueAsNumber,
-                            tiempo: nuevo[1].valueAsNumber,
-                            prioridad: nuevo[0].valueAsNumber
+                            tiempo: nuevo[1].valueAsNumber
                         };
+                        this.procesos.push(p);
                     }
-
                     else {
                         Swal.fire({
                             icon: '',
@@ -161,9 +129,6 @@
                     nuevo[0].value = '';
                     nuevo[1].value = '';
                     nuevo[2].value = '';
-
-                    console.log(p);
-                    this.procesos.push(p);
                 }
             }
         });
