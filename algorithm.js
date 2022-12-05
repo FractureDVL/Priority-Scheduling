@@ -34,8 +34,7 @@ let isRunning = false;
 
 //Busca cual es el valor con menor prioridad y lo envia a ejecucion
 async function proximoEjecutar() {
-    proximo = procesos[0];
-    
+    let proximo = procesos[0];
     let pos = 0;
     procesos.forEach(element => {
         if (proximo.prioridad > element.prioridad && element.finished === false) {
