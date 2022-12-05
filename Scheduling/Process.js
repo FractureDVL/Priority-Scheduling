@@ -1,6 +1,4 @@
-const procesos = [];
-
-class Process {
+export class Process {
     constructor(id, llegada, tiempo, prioridad) {
         this.id = id;
         this.llegada = llegada;
@@ -9,10 +7,4 @@ class Process {
     }
 }
 
-function addProcess(proceso){
-    procesos.push(proceso);
-}
-
-//const P1 = new Proceso("P1", 0 , 20 , 1);
-
-export {addProcess, procesos};
+export {Process as Proceso};

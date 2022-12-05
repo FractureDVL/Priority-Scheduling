@@ -23,7 +23,7 @@
     </header>
     <div id="app" class="cont">
         <div class="child">
-            <h1 class="title" v-on:click="showData()">Procesos en cola</h1>
+            <h1 class="title">Procesos en cola {{ c }}</h1>
             <div class="table-container">
                 <table class="table" id="table">
                     <thead>
@@ -35,10 +35,10 @@
                     <tbody id="datat">
                         <tr v-for="proceso in procesos">
                             <td><input type="text" v-bind:value="proceso.id" readonly></td>
-                            <td><input v-bind:id="proceso.id" type="number" v-bind:value="proceso.prioridad"></td>
-                            <td><input v-bind:id="proceso.tiempo" type="number" v-bind:value="proceso.tiempo"></td>
-                            <td><input v-bind:id="proceso.llegada" type="number" v-bind:value="proceso.llegada"
-                                    v-on:keyup.enter="edit(proceso.id)"></td>
+                            <td><input type="number" v-bind:value="proceso.prioridad"></td>
+                            <td><input type="number" v-bind:value="proceso.tiempo"></td>
+                            <td><input type="number" v-bind:value="proceso.llegada" v-on:keyup.enter="edit(proceso.id)">
+                            </td>
                         </tr>
                         <!--Nuevos procesos-->
                         <tr class="newProcess" v-if="show || this.procesos != null">
@@ -48,18 +48,25 @@
                             <td><input class="input-new" type="number" placeholder="Llegada" required></td>
                         </tr>
                     </tbody>
-
                 </table>
-                <div class="big-button" v-on:click.prevent="add()">
+                <div class="big-button add-button" v-on:click.prevent="add()">
                     <i class="fa fa-plus" aria-hidden="true"></i>
                 </div>
+
+            </div>
+            <div class="big-button play-button" v-on:click="contador()">
+                <i class="fa-solid fa fa-play"></i>
             </div>
         </div>
         <!--Gannt chart-->
-        <div class="child gannt"></div>
+        <div class="child gannt">
+            <div id="example-gantt">
+            </div>
+        </div>
     </div>
     <script src="https://unpkg.com/vue@next"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script>
         class Proceso {
             constructor(id, llegada, tiempo, prioridad) {
@@ -73,24 +80,18 @@
             data() {
                 return {
                     procesos: [],
-                    nuevo: {
-                        llegada: null,
-                        tiempo: null,
-                        prioridad: null,
-                        stoped: null,
-                        running: null,
-                        finished: null
-                    },
                     running: false,
                     editing: false,
-                    show: false
+                    show: false,
+                    c: 0
                 };
             },
             computed: {
                 //Generador para el proximo id
                 newId: function name(params) {
                     return `P${this.procesos.length + 1}`;
-                }
+                },
+
             },
             methods: {
                 //Valida los datos de entrada en los campos
@@ -109,14 +110,10 @@
                     var nuevo = document.querySelectorAll('tr.newProcess input.input-new');
                     this.show = this.show ? '' : this.show = true;
                     var nproc = [nuevo[0].value, nuevo[1].value, nuevo[2].value];
+                    //Clases
 
                     if (this.valid(nproc)) {
-                        var p = {
-                            id: this.newId,
-                            prioridad: nuevo[0].valueAsNumber,
-                            llegada: nuevo[2].valueAsNumber,
-                            tiempo: nuevo[1].valueAsNumber
-                        };
+                        let p = new Proceso(this.newId, nuevo[2].valueAsNumber, nuevo[1].valueAsNumber, nuevo[0].valueAsNumber);
                         this.procesos.push(p);
                     }
                     else {
@@ -129,6 +126,14 @@
                     nuevo[0].value = '';
                     nuevo[1].value = '';
                     nuevo[2].value = '';
+                },
+                contador() {
+                    timer: setInterval(() => {
+                        this.c++;
+                        if (this.c >= 1000) {
+                            this.c = 0;
+                        }
+                    }, 1000)
                 }
             }
         });
