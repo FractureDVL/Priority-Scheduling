@@ -13,13 +13,13 @@ class Process {
 
 let procesos = [
     //id, llegada, tiempo, prioridad, procesado, stoped, running, finished
-    new Process('P1', 2, 7, 0, 0, false, false, false), // 2
-    new Process('P2', 0, 7, 1, 0, false, false, false), // 1
-    new Process('P3', 6, 3, 2, 0, false, false, false), // 4
-    new Process('P4', 4, 7, 3, 0, false, false, false), // 5
-    new Process('P5', 6, 3, 4, 0, false, false, false)  // 3
+    new Process('P1', 2, 7, 5, 0, false, false, false), // 4
+    new Process('P2', 1, 7, 4, 0, false, false, false), // 3
+    new Process('P3', 6, 3, 5, 0, false, false, false), // 2
+    new Process('P4', 0, 7, 4, 0, false, false, false), // 1
+    new Process('P5', 6, 3, 3, 0, false, false, false)  // 5
 ];
-//P2,P1,P5,P3,P4;
+//P5,P4,P2,P1,P3;
 
 //Procesos ejecutando
 let running = [];
@@ -43,7 +43,7 @@ function bubbleSort(procesos, tamanio) {
             procesos[i] = procesos[i + 1];
             procesos[i + 1] = temp;
             contador++;
-        } else if (procesos[i].llegada > procesos[i + 1].llegada) {
+        } else if (procesos[i].llegada > procesos[i + 1].llegada && procesos[i].prioridad === procesos[i + 1].prioridad) {
             let temp = procesos[i];
             procesos[i] = procesos[i + 1];
             procesos[i + 1] = temp;
