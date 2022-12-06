@@ -13,9 +13,9 @@ class Process {
 
 let procesos = [
     //id, llegada, tiempo, prioridad, procesado, stoped, running, finished
-    new Process('P1', 2, 7, 1, 0, false, false, false), // 2
+    new Process('P1', 2, 7, 0, 0, false, false, false), // 2
     new Process('P2', 0, 7, 1, 0, false, false, false), // 1
-    new Process('P3', 6, 3, 3, 0, false, false, false), // 4
+    new Process('P3', 6, 3, 2, 0, false, false, false), // 4
     new Process('P4', 4, 7, 3, 0, false, false, false), // 5
     new Process('P5', 6, 3, 4, 0, false, false, false)  // 3
 ];
@@ -56,7 +56,7 @@ function bubbleSort(procesos, tamanio) {
     bubbleSort(procesos, tamanio - 1);
 }
 
-//Ejecuta un proceso disminuyendo el valor de tiempo iterativo
+//Ejecuta un proceso disminuyendo el valor de tiempo recursivo
 function ejecutarRecursivo(_actual) {
     if (_actual.tiempo > 0) {
         console.log(`${_actual.id}:${_actual.tiempo}`);
@@ -65,38 +65,41 @@ function ejecutarRecursivo(_actual) {
         ejecutarRecursivo(_actual);
     } else {
         _actual.finished = true;
-        console.log(_actual);
+        // console.log(_actual);
         console.log(`Proceso terminado: ${_actual.id}`);
         finished.push(_actual);
+        hasNext = false;
     }
+}
+
+//Envia a ejectuar un proceso en la pila
+function proximoEjecutar() {
+    running.push(procesos.shift());
+    hasNext = true;
 }
 
 //Algoritmo de planeacion por prioridad
 function priorityScheduling() {
-    if (procesos.length === 0) {
-        return console.log(`Terminados :)`);
-    } else if (procesos.length > 0) {
-        if (running.length === 0) {
+    if (procesos.length > 0 || hasNext) {
+        if (running.length === 0 && !hasNext) {
             proximoEjecutar();
             priorityScheduling();
-        } else if (running.length > 0) {
-            let actual = running.pop();
-            if (actual.finished === false) {
-                ejecutarRecursivo(actual);
-                priorityScheduling();
-            }
-            else priorityScheduling();
+        } else if (hasNext) {
+            ejecutarRecursivo(running.pop());
+            priorityScheduling();
         }
-    };
+    } else if (procesos.length === 0 && !hasNext) {
+        return console.log(`Terminados :)`);
+    }
 }
 
 //--Start Codigo Main--
 console.log('Ejecutando procesos:');
-// priorityScheduling();
+bubbleSort(procesos, procesos.length);
+priorityScheduling();
 // proximoEjecutar();
 // let actual = running.pop();
 // ejecutarRecursivo(actual);
 // console.log(procesos);
+// console.log(procesos);
 
-bubbleSort(procesos, procesos.length);
-console.log(procesos);
