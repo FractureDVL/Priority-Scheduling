@@ -11,10 +11,6 @@ class Process {
     }
 }
 
-const sleep = (ms) => {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 let procesos = [
     //id, llegada, tiempo, prioridad, procesado, stoped, running, finished
     new Process('P1', 2, 7, 5, 0, false, false, false), // 4
@@ -36,6 +32,7 @@ let finished = [];
 let TIMER = 1000;
 let isRunning = false;
 let hasNext = false;
+let current = null;
 
 //Ordenamiento 1.Prioridad, luego 2.llegada (Por buburja)
 function bubbleSort(procesos, tamanio) {
@@ -63,6 +60,7 @@ function bubbleSort(procesos, tamanio) {
 //Demora la ejecucion de la siguiente isntruccion por x tiempo
 let wait = (ms) => {
     const start = Date.now();
+    
     let now = start;
     while (now - start < ms) {
         now = Date.now();
@@ -76,7 +74,7 @@ function ejecutarRecursivo(_actual) {
         console.log(`${_actual.id}:${_actual.tiempo}`);
         _actual.tiempo = _actual.tiempo - 1;
         _actual.procesado = _actual.procesado + 1;
-        ejecutarRecursivo(_actual)
+        ejecutarRecursivo(_actual);
     } else {
         _actual.finished = true;
         console.log(`Proceso terminado: ${_actual.id}`);
@@ -98,7 +96,9 @@ function priorityScheduling() {
             proximoEjecutar();
             priorityScheduling();
         } else if (hasNext) {
-            ejecutarRecursivo(running.pop());
+            current = running.pop();
+            ejecutarRecursivo(current);
+            console.log(current);
             priorityScheduling();
         }
     } else if (procesos.length === 0 && !hasNext) {
