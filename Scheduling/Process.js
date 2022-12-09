@@ -33,7 +33,8 @@ let TIMER = 1000;
 let isRunning = false;
 let hasNext = false;
 let current = null;
-
+//swaps
+let swaps = [];
 //Ordenamiento 1.Prioridad, luego 2.llegada (Por buburja)
 function bubbleSort(procesos, tamanio) {
     if (tamanio == 1) return;
@@ -43,11 +44,13 @@ function bubbleSort(procesos, tamanio) {
             let temp = procesos[i];
             procesos[i] = procesos[i + 1];
             procesos[i + 1] = temp;
+            swaps.push([procesos[i].id, procesos[i + 1].id, i, i + 1]);
             contador++;
         } else if (procesos[i].llegada > procesos[i + 1].llegada && procesos[i].prioridad === procesos[i + 1].prioridad) {
             let temp = procesos[i];
             procesos[i] = procesos[i + 1];
             procesos[i + 1] = temp;
+            swaps.push([procesos[i].id, procesos[i + 1].id, i, i + 1]);
             contador++;
         }
     }
@@ -60,7 +63,7 @@ function bubbleSort(procesos, tamanio) {
 //Demora la ejecucion de la siguiente isntruccion por x tiempo
 let wait = (ms) => {
     const start = Date.now();
-    
+
     let now = start;
     while (now - start < ms) {
         now = Date.now();
@@ -107,7 +110,11 @@ function priorityScheduling() {
 }
 
 //--Start Codigo Main--
-console.log('Ejecutando procesos:');
+// console.log('Ejecutando procesos:');
 bubbleSort(procesos, procesos.length);
-priorityScheduling();
+// priorityScheduling();
+
+swaps.forEach(element => {
+   console.log(element);
+});
 
