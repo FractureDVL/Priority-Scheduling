@@ -58,10 +58,14 @@
                             </tr>
                             <!--Nuevos procesos-->
                             <tr class="newProcess zoom" v-if="show || this.procesos != null">
-                                <td><input class="cell" type="text" v-bind:placeholder="newId" readonly></td>
-                                <td><input class="input-new cell" type="number" placeholder="Prioridad" required></td>
-                                <td><input class="input-new cell" type="number" placeholder="Tiempo" required></td>
-                                <td><input class="input-new cell" type="number" placeholder="Llegada" required></td>
+                                <td class="td-cell"><input class="cell" type="text" v-bind:placeholder="newId" readonly>
+                                </td>
+                                <td class="td-cell"><input class="input-new cell" type="number" placeholder="Prioridad"
+                                        required></td>
+                                <td class="td-cell"><input class="input-new cell" type="number" placeholder="Tiempo"
+                                        required></td>
+                                <td class="td-cell"><input class="input-new cell" type="number" placeholder="Llegada"
+                                        required></td>
                             </tr>
                         </tbody>
                     </table>
@@ -189,7 +193,7 @@
                             icon: '',
                             title: 'Oops...',
                             text: 'Rellene todos los campos.',
-                        })
+                        });
                     }
                     nuevo[0].value = '';
                     nuevo[1].value = '';
@@ -221,35 +225,33 @@
                     this.bubbleSort(procesos, tamanio - 1);
                 },
                 swapAnimation(swaps) {
-                    if (swaps.length == 0) {
-                        return this.isSorted = true;
-                    }
-                    let [i, j, x, y] = swaps.shift();
-
-                    console.log(`[${i}, ${j}, ${x}, ${y}]`);
-
-                    let outside = document.querySelector(`#${j}`);
-                    let insert = document.querySelector(`#${i}`);
-                    let inputs = document.querySelectorAll(`#${i} > td > input, #${j} > td > input`);
-
-                    outside.classList.remove("moveRowIn");
-                    insert.classList.remove("moveRowOut");
-                    for (const input of inputs) {
-                        input.classList.add('see');
-                    }
-
-                    let temp = this.procesosView[x];
-                    this.procesosView[x] = this.procesosView[y];
-                    this.procesosView[y] = temp;
-
                     setTimeout(() => {
-                        for (const input of inputs) {
-                            input.classList.remove('see');
+                        if (swaps.length == 0) {
+                            return this.isSorted = true;
                         }
-                        outside.classList.add("moveRowIn");
+                        let [i, j, x, y] = swaps.shift();
+                        let outside = document.querySelector(`#${j}`);
+                        let insert = document.querySelector(`#${i}`);
+                        let inputs = document.querySelectorAll(`#${i} > td > input, #${j} > td > input`);
+                        outside.classList.add("moveRowOut");
                         insert.classList.add("moveRowOut");
-                        this.swapAnimation(swaps);
-                    }, this.TIMER * 1.5);
+
+                        for (const input of inputs) {
+                            input.classList.add('see');
+                        }
+                        setTimeout(() => {
+                            for (const input of inputs) {
+                                input.classList.remove('see');
+                            }
+                            let temp = this.procesosView[x];
+                            this.procesosView[x] = this.procesosView[y];
+                            this.procesosView[y] = temp;
+                            outside.classList.remove("moveRowOut");
+                            insert.classList.remove("moveRowOut");
+                            this.swapAnimation(swaps);
+                        }, this.TIMER);
+                    }, 1000);
+
                 },
                 sort() {
                     if (this.isSorted) {
@@ -258,7 +260,6 @@
                         this.bubbleSort(this.procesosBack, this.procesosBack.length);
                         this.swapAnimation(this.swaps);
                     }
-
                 },
                 wait: (ms) => {
                     const start = Date.now();
