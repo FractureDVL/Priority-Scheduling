@@ -29,10 +29,13 @@
 }
 
 .child {
-    display: flex;
     position: relative;
-    display: inline-block;
+    flex-direction: column;
+    display: flex;
+    flex: 1;
     border: 1px solid #0000;
+    justify-content: center;
+    margin: 0 auto;
 }
 
 /* Tabla */
@@ -274,8 +277,20 @@ input:focus {
 
 
 .see {
-    background-color: #ffe15d95 !important;
+    animation-name: see;
+    animation-duration: 3.5s;
 }
+
+@keyframes see {
+    from {
+        background-color: #ffe15d95;
+    }
+
+    to {
+        background-color: transparent;
+    }
+}
+
 
 td.td-cell, th.td-cell {
     max-width: 6em;
@@ -291,6 +306,7 @@ td.td-cell, th.td-cell {
     margin-bottom: -150px;
 
 }
+
 /* 
 .moveRowIn {
     animation-duration: 1s;
@@ -300,7 +316,7 @@ td.td-cell, th.td-cell {
 } */
 
 .moveRowOut {
-    animation-duration: 1s;
+    animation-duration: .5s;
     animation-name: slideOut;
     position: relative;
     animation-fill-mode: backwards;
@@ -310,27 +326,61 @@ td.td-cell, th.td-cell {
     0% {
         margin-bottom: 0;
     }
-    50%{
+
+    50% {
         transform: scale(1.1);
-    }
-    100% {
-        transform: scale(1);
         margin-bottom: 43.2px;
+    }
+
+    100% {
+        transform: translateY(43.2px);
         color: gray;
     }
 }
 
 @keyframes slideOut {
     0% {
-        
-        margin-left: 0;
+        margin-top: 0;
+        transform: scale(1);
     }
-    50%{
-        transform: scale(1.2);
+
+    50% {
+        transform: scale(1.1);
+        margin-top: 43.2px;
     }
+
     100% {
         transform: scale(1);
-        margin-top: 43.2px;
         color: gray;
     }
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    flex: 1;
+    padding: 0px 50px;
+    padding-bottom: 50px;
+    margin-top: 10px;
+}
+
+.ganttChart {
+    font-family: "Avenir Next W01", "Proxima Nova W01", "Rubik", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.scroll::-webkit-scrollbar-track
+{
+	border: 1px solid black;
+	background-color: #F5F5F5;
+}
+
+.scroll::-webkit-scrollbar
+{
+	width: 10px;
+	background-color: #F5F5F5;
+}
+
+.scroll::-webkit-scrollbar-thumb
+{
+	background-color: #000000;	
 }

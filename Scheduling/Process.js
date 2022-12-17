@@ -112,9 +112,9 @@ function priorityScheduling() {
 //--Start Codigo Main--
 // console.log('Ejecutando procesos:');
 bubbleSort(procesos, procesos.length);
-// priorityScheduling();
+priorityScheduling();
 
-swaps.forEach(element => {
+finished.forEach(element => {
    console.log(element);
 });
 

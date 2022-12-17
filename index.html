@@ -17,7 +17,7 @@
     <title>Prority Scheduling</title>
 </head>
 
-<body>
+<body class="scroll">
     <header class="header">
         <h1 class="page-title">Programación Prioritaria</h1>
         <svg class="github-cat" viewBox="0 0 250 250" aria-hidden="true"
@@ -36,7 +36,7 @@
     <div id="app" class="cont">
         <div class="child">
             <div class="data-container">
-                <h3 class="title">Procesos en cola</h3>
+                <h3 class="title"  v-on:click="chargeExample()">Procesos en cola</h3>
                 <div class="table-container">
                     <table class="table" id="table">
                         <thead>
@@ -47,17 +47,26 @@
                         </thead>
                         <tbody id="datat">
                             <tr :id="proceso.id" class="zoom" v-for="proceso in procesosView">
-                                <td class="td-cell"><input class="cell" type="text" v-bind:value="proceso.id" readonly>
+                                <td class="td-cell"><input class="cell" type="text" v-model="proceso.id" readonly>
                                 </td>
-                                <td class="td-cell"><input class="cell" type="number" v-bind:value="proceso.prioridad">
+                                <td class="td-cell">
+                                    <input class="cell" type="number" v-model="proceso.prioridad"
+                                        @keyup.enter="edit(proceso.id, 'prioridad',proceso.prioridad)"
+                                        @blur="edit(proceso.id, 'prioridad',proceso.prioridad)">
                                 </td>
-                                <td class="td-cell"><input class="cell" type="number" v-bind:value="proceso.tiempo">
+                                <td class="td-cell">
+                                    <input class="cell" type="number" v-model="proceso.tiempo"
+                                        @keyup.enter="edit(proceso.id, 'tiempo',newTiempo)"
+                                        @blur="edit(proceso.id, 'tiempo',proceso.tiempo)">
                                 </td>
-                                <td class="td-cell"><input class="cell " type="number" v-bind:value="proceso.llegada"
-                                        v-on:keyup.enter="edit(proceso.id)"></td>
+                                <td class="td-cell">
+                                    <input class="cell " type="number" v-model="proceso.llegada"
+                                        @keyup.enter="edit(proceso.id, 'llegada',newLlegada)"
+                                        @blur="edit(proceso.id, 'llegada',proceso.llegada)">
+                                </td>
                             </tr>
                             <!--Nuevos procesos-->
-                            <tr class="newProcess zoom" v-if="show || this.procesos != null">
+                            <tr class="newProcess zoom" v-if="show || this.procesosView != null">
                                 <td class="td-cell"><input class="cell" type="text" v-bind:placeholder="newId" readonly>
                                 </td>
                                 <td class="td-cell"><input class="input-new cell" type="number" placeholder="Prioridad"
@@ -72,7 +81,7 @@
                     <div class="big-button add-button" v-on:click.prevent="add()">
                         <i class="fa fa-plus" aria-hidden="true"></i>
                     </div>
-                    <div class="big-button play-button" v-on:click="sort()">
+                    <div class="big-button play-button" v-on:click="start()">
                         <i class="fa-solid fa fa-play"></i>
                     </div>
                     <!-- Boton de animacion -->
@@ -86,232 +95,26 @@
                 </div>
             </div>
         </div>
-        <!--Gannt chart
+        <!-- Gannt chart -->
         <div class="child gantt">
-            <div id="example-gantt">
-                <h3 class="title">Procesos finalizados</h3>
-                <div class="table-container_result">
-                    <table class="table result" id="table">
-                        <thead>
-                            <th>Id proceso</th>
-                            <th>Tiempo procesado</th>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
+            <!-- <h3 class="title">Procesos finalizados</h3> -->
+            <div class="container">
+                <div id="container"></div>
             </div>
-        </div> -->
+        </div>
     </div>
+    <hr>
+
+
+    <!--VueJS-->
     <script src="https://unpkg.com/vue@next"></script>
+    <!--SweetAlert-->
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script>
-        class Proceso {
-            constructor(id, llegada, tiempo, prioridad, procesado, stoped, running, finished) {
-                this.id = id;
-                this.llegada = llegada;
-                this.tiempo = tiempo;
-                this.prioridad = prioridad;
-                this.procesado = procesado;
-                this.stoped = stoped;
-                this.running = running;
-                this.finished = finished;
-            }
-        }
-        const app = Vue.createApp({
-            data() {
-                return {
-                    //Procesos del usuario
-                    procesosView: [
-                        //id, llegada, tiempo, prioridad, procesado, stoped, running, finished
-                        new Proceso('P1', 2, 7, 5, 0, false, false, false), // 4
-                        new Proceso('P2', 1, 7, 4, 0, false, false, false), // 3
-                        new Proceso('P3', 6, 3, 5, 0, false, false, false), // 2
-                        new Proceso('P4', 0, 7, 4, 0, false, false, false), // 1
-                        new Proceso('P5', 6, 3, 3, 0, false, false, false)  // 5
-                    ],
-                    editing: false,
-                    show: false,
-                    //Procesos ordernados en sort
-                    procesosBack: [
-                        new Proceso('P1', 2, 7, 5, 0, false, false, false), // 4
-                        new Proceso('P2', 1, 7, 4, 0, false, false, false), // 3
-                        new Proceso('P3', 6, 3, 5, 0, false, false, false), // 2
-                        new Proceso('P4', 0, 7, 4, 0, false, false, false), // 1
-                        new Proceso('P5', 6, 3, 3, 0, false, false, false)  // 5
-                    ],
-                    //Procesos ejecutando
-                    running: [],
-                    //Procesos pausados
-                    stoped: [],
-                    //Procesos terminados
-                    finished: [],
-                    swaps: [],
-                    TIMER: 1000,
-                    tiempoTotal: 0,
-                    isRunning: false,
-                    hasNext: false,
-                    //current
-                    current: null,
-                    isSorted: false
-
-                };
-            },
-            computed: {
-                //Generador para el proximo id
-                newId: function name(params) {
-                    return `P${this.procesosView.length + 1}`;
-                }
-            },
-            methods: {
-                //Valida los datos de entrada en los campos
-                valid(arr) {
-                    var number = /[0-9]*/;
-                    valid = true;
-                    for (let i = 0; i < arr.length; i++) {
-                        if (!(number.test(arr[0]) && arr[0] != '')) {
-                            valid = false;
-                        }
-                    }
-                    return valid;
-                },
-                //Agrega una fila con nuevo un nuevo procesos
-                add() {
-                    var nuevo = document.querySelectorAll('tr.newProcess input.input-new');
-                    this.show = this.show ? '' : this.show = true;
-                    var nproc = [nuevo[0].value, nuevo[1].value, nuevo[2].value];
-                    //Clases
-                    if (this.valid(nproc)) {
-                        let p = new Proceso(this.newId, nuevo[2].valueAsNumber, nuevo[1].valueAsNumber, nuevo[0].valueAsNumber, 0, false, false, false);
-                        this.procesosView.push(p);
-                        this.procesosBack.push(p);
-                        this.isSorted = false;
-                    }
-                    else {
-                        Swal.fire({
-                            icon: '',
-                            title: 'Oops...',
-                            text: 'Rellene todos los campos.',
-                        });
-                    }
-                    nuevo[0].value = '';
-                    nuevo[1].value = '';
-                    nuevo[2].value = '';
-
-                },
-                //Ordenamiento 1.Prioridad, luego 2.llegada (Por buburja)
-                bubbleSort(procesos, tamanio) {
-                    if (tamanio == 1) return;
-                    let contador = 0;
-                    for (let i = 0; i < tamanio - 1; i++) {
-                        if (procesos[i].prioridad > procesos[i + 1].prioridad) {
-                            let temp = procesos[i];
-                            procesos[i] = procesos[i + 1];
-                            procesos[i + 1] = temp;
-                            this.swaps.push([procesos[i].id, procesos[i + 1].id, i, i + 1]);
-                            contador++;
-                        } else if (procesos[i].llegada > procesos[i + 1].llegada && procesos[i].prioridad === procesos[i + 1].prioridad) {
-                            let temp = procesos[i];
-                            procesos[i] = procesos[i + 1];
-                            procesos[i + 1] = temp;
-                            this.swaps.push([procesos[i].id, procesos[i + 1].id, i, i + 1]);
-                            contador++;
-                        }
-                    }
-                    if (contador == 0) {
-                        return;
-                    }
-                    this.bubbleSort(procesos, tamanio - 1);
-                },
-                swapAnimation(swaps) {
-                    setTimeout(() => {
-                        if (swaps.length == 0) {
-                            return this.isSorted = true;
-                        }
-                        let [i, j, x, y] = swaps.shift();
-                        let outside = document.querySelector(`#${j}`);
-                        let insert = document.querySelector(`#${i}`);
-                        let inputs = document.querySelectorAll(`#${i} > td > input, #${j} > td > input`);
-                        outside.classList.add("moveRowOut");
-                        insert.classList.add("moveRowOut");
-
-                        for (const input of inputs) {
-                            input.classList.add('see');
-                        }
-                        setTimeout(() => {
-                            for (const input of inputs) {
-                                input.classList.remove('see');
-                            }
-                            let temp = this.procesosView[x];
-                            this.procesosView[x] = this.procesosView[y];
-                            this.procesosView[y] = temp;
-                            outside.classList.remove("moveRowOut");
-                            insert.classList.remove("moveRowOut");
-                            this.swapAnimation(swaps);
-                        }, this.TIMER);
-                    }, 1000);
-
-                },
-                sort() {
-                    if (this.isSorted) {
-                        return this.alertSorted();
-                    } else {
-                        this.bubbleSort(this.procesosBack, this.procesosBack.length);
-                        this.swapAnimation(this.swaps);
-                    }
-                },
-                wait: (ms) => {
-                    const start = Date.now();
-                    let now = start;
-                    while (now - start < ms) {
-                        now = Date.now();
-                    }
-                },
-                alertSorted() {
-                    Swal.fire({
-                        icon: '',
-                        title: 'Oops...',
-                        text: 'Los procesos ya se encuentran ordenados',
-                    });
-                },
-                // Ejecuta un proceso disminuyendo el valor de tiempo recursivo
-                ejecutarRecursivo(_actual) {
-                    if (_actual.tiempo > 0) {
-                        this.wait(this.TIMER);
-                        _actual.tiempo = _actual.tiempo - 1;
-                        _actual.procesado = _actual.procesado + 1;
-                        this.tiempoTotal += 1;
-                        this.ejecutarRecursivo(_actual);
-                    } else {
-                        _actual.finished = true;
-                        this.finished.push(_actual);
-                        this.hasNext = false;
-                    }
-                },
-                // Envia a ejectuar un proceso en la pila
-                proximoEjecutar() {
-                    this.running.push(this.procesos.shift());
-                    this.hasNext = true;
-                },
-                //Algoritmo de planeacion por prioridad
-                priorityScheduling() {
-                    if (this.procesos.length > 0 || this.hasNext) {
-                        if (this.running.length === 0 && !this.hasNext) {
-                            this.proximoEjecutar();
-                            this.priorityScheduling();
-                        } else if (this.hasNext) {
-                            this.ejecutarRecursivo(this.running.pop());
-                            this.priorityScheduling();
-                        }
-                    } else if (this.procesos.length === 0 && !this.hasNext) {
-                        return console.log(`Terminados :)`);
-                    }
-                }
-            }
-        });
-        app.mount("#app");
-    </script>
+    <!--ChartJS-->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/gantt/modules/gantt.js"></script>
+    <script src="https://code.highcharts.com/gantt/modules/exporting.js"></script>
+    <script src="./Process.js"></script>
 </body>
 
 </html>
