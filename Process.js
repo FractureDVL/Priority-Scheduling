@@ -10,7 +10,6 @@ class Proceso {
         this.finished = finished;
     }
 }
-
 const app = Vue.createApp({
     data() {
         return {
@@ -41,8 +40,6 @@ const app = Vue.createApp({
             finished: [],
             //Save swaps
             swaps: [],
-            //Save data for show in the chart
-            chartDataFormat: [],
             TIMER: 500,
             tiempoTotal: 0,
             isRunning: false,
@@ -51,67 +48,16 @@ const app = Vue.createApp({
             current: null,
             isSorted: false,
             chart: null,
-            categoriesProcess: []
+            categoriesProcess: [],
+            //burst the time execution process
+            bursted: false,
+            //Flags for pseudocode
+            pointData: [],
+            isShowingData: false
         }
     },
     mounted() {
-        this.chart = Highcharts.chart('container', {
-            chart: {
-                type: 'xrange',
-                className: 'ganttChart',
-                backgroundColor: "#263159",
-                borderRadius: 5,
-                padding: 20
-            },
-            title: {
-                text: 'Procesos finalizados',
-                style: {
-                    color: "#ffff",
-                    fontSize: 30
-                }
-            },
-            credits: {
-                enabled: false,
-                href: 'https://github.com/FractureDVL/Priority-Scheduling',
-                text: 'FractureDVL',
-                style: {
-                    color: '#ffff',
-                    fontSize: 10
-                }
-            },
-            colors: ['#ffabab', '#d9abff', '#ffdaab', '#ddffab', '#abe4ff'],
-            xAxis: {
-                type: 'linear',
-                title: 'Series',
-                labels: {
-                    fontFamily: 'Avenir Next W01',
-                    style: {
-                        color: "#ffff",
-                        fontSize: 15
-                    }
-                },
-                title: {
-                    text: ''
-                }
-            },
-            yAxis: {
-                //array con categorias
-                categories: this.categoriesProcess,
-                reversed: true,
-                labels: {
-                    fontFamily: 'Avenir Next W01',
-                    style: {
-                        color: "#ffff",
-                        fontSize: 15
-                    }
-                },
-            },
-            series: [{
-                name: '',
-                // data y: indexador de categorias, x:ragon incio, x2: rango final
-                data: this.chartDataFormat
-            }]
-        });
+        this.mountChart();
     },
     computed: {
         //Generador para el proximo id
@@ -120,8 +66,69 @@ const app = Vue.createApp({
         }
     },
     methods: {
+        mountChart() {
+            let newChart = new Highcharts.chart('container', {
+                chart: {
+                    type: 'xrange',
+                    className: 'ganttChart',
+                    backgroundColor: "#263159",
+                    borderRadius: 5,
+                    padding: 20
+                },
+                title: {
+                    text: 'Finished processes',
+                    style: {
+                        color: "#ffff",
+                        fontSize: 30
+                    }
+                },
+                credits: {
+                    enabled: false,
+                    href: 'https://github.com/FractureDVL/Priority-Scheduling',
+                    text: 'FractureDVL',
+                    style: {
+                        color: '#ffff',
+                        fontSize: 10
+                    }
+                },
+                colors: ['#ffabab', '#d9abff', '#ffdaab', '#ddffab', '#abe4ff'],
+                xAxis: {
+                    type: 'linear',
+                    title: 'Series',
+                    labels: {
+                        fontFamily: 'Avenir Next W01',
+                        style: {
+                            color: "#ffff",
+                            fontSize: 15
+                        }
+                    },
+                    title: {
+                        text: ''
+                    }
+                },
+                yAxis: {
+                    //array con categorias
+                    categories: this.categoriesProcess,
+                    reversed: true,
+                    labels: {
+                        fontFamily: 'Avenir Next W01',
+                        style: {
+                            color: "#ffff",
+                            fontSize: 15
+                        }
+                    },
+                },
+                series: [{
+                    name: '',
+                    // data y: indexador de categorias, x:ragon incio, x2: rango final
+                    data: this.pointData
+                }]
+            });
+            this.chart = newChart;
+            this.isShowingData = true;
+        },
+        //Load the process example
         chargeExample() {
-            console.log("Bro :)");
             let example = [
                 new Proceso('P1', 2, 7, 5, 0, false, false, false), // 4
                 new Proceso('P2', 1, 7, 4, 0, false, false, false), // 3
@@ -143,17 +150,20 @@ const app = Vue.createApp({
             }
             return valid;
         },
-        //Agrega una fila con nuevo un nuevo procesos
+        //Agrega una fila con nuevo un nuevo procesos ***
         add() {
             var nuevo = document.querySelectorAll('tr.newProcess input.input-new');
             this.show = this.show ? '' : this.show = true;
             var nproc = [nuevo[0].value, nuevo[1].value, nuevo[2].value];
             //Clases
             if (this.valid(nproc)) {
-                let p = new Proceso(this.newId, nuevo[2].valueAsNumber, nuevo[1].valueAsNumber, nuevo[0].valueAsNumber, 0, false, false, false);
-                this.procesosView.push(p);
-                this.procesosBack.push(p);
+                let a = new Proceso(this.newId, nuevo[2].valueAsNumber, nuevo[1].valueAsNumber, nuevo[0].valueAsNumber, 0, false, false, false);
+                let b = new Proceso(this.newId, nuevo[2].valueAsNumber, nuevo[1].valueAsNumber, nuevo[0].valueAsNumber, 0, false, false, false);
+                this.procesosView.push(a);
+                this.procesosBack.push(b);
                 this.isSorted = false;
+                this.bursted = false;
+                this.isShowingData = true;
             }
             else {
                 Swal.fire({
@@ -195,7 +205,7 @@ const app = Vue.createApp({
         swapAnimationSort(swaps) {
             setTimeout(() => {
                 if (swaps.length == 0) {
-                    return;
+                    return this.bursted = true;
                 }
                 let [i, j, x, y] = swaps.shift();
                 let outside = document.querySelector(`#${j}`);
@@ -225,14 +235,16 @@ const app = Vue.createApp({
         },
         //Start the sorting if isn't sorted 
         sort() {
-            if (this.isSorted) {
-                return this.alertSorted();
-            } else {
-                this.bubbleSort(this.procesosBack, this.procesosBack.length);
-                this.swapAnimationSort(this.swaps);
+            if (this.procesosBack.length > 0) {
+                if (this.isSorted) {
+                    return this.alertSorted();
+                } else {
+                    this.bubbleSort(this.procesosBack, this.procesosBack.length);
+                    this.swapAnimationSort(this.swaps);
 
+                }
+                return this.isSorted = true;
             }
-            return this.isSorted = true;
         },
         //wait time in ms 
         wait: (ms) => {
@@ -254,26 +266,22 @@ const app = Vue.createApp({
         //edit logic for process object
         edit(id, etiqueta, nuevoValor) {
             let indexProceso = document.getElementById(`${id}`).rowIndex - 1;
-            console.log('dex ' + indexProceso + ' et ' + etiqueta + ' id ' + id);
             let input = nuevoValor;
             this.isSorted = false;
             switch (etiqueta) {
                 case 'prioridad':
-                    console.log(input);
                     if (this.isValidEdit(input)) {
                         this.procesosView[indexProceso].prioridad = input;
                         console.log("Se ha actualizado un valor");
                     }
                     break;
                 case 'tiempo':
-                    console.log(input);
                     if (this.isValidEdit(input)) {
                         this.procesosView[indexProceso].tiempo = input;
                         console.log("Se ha actualizado un valor");
                     }
                     break;
                 case 'llegada':
-                    console.log(input);
                     if (this.isValidEdit(input)) {
                         this.procesosView[indexProceso].llegada = input;
                         console.log("Se ha actualizado un valor");
@@ -283,7 +291,17 @@ const app = Vue.createApp({
                 //Alerta de input invalido
             }
             this.procesosBack = JSON.parse(JSON.stringify(this.procesosView));
+            this.clearChart();
+            this.isShowingData = true;
+            this.bursted = false;
         },
+        clearChart() {
+            this.chart.destroy();
+            this.pointData.splice(0, this.pointData.length);
+            this.finished.splice(0, this.finished.length);
+            this.mountChart();
+        }
+        ,
         //Show alert if the process are sorted (using isSorted variable)
         alertSorted() {
             Swal.fire({
@@ -315,7 +333,6 @@ const app = Vue.createApp({
         },
         //Algoritmo de planeacion por prioridad
         priorityScheduling() {
-            console.log(this.procesosBack);
             if (this.procesosBack.length > 0 || this.hasNext) {
                 if (this.running.length === 0 && !this.hasNext) {
                     this.proximoEjecutar();
@@ -328,35 +345,72 @@ const app = Vue.createApp({
                 return console.log(`Terminados :)`);
             }
         },
+        burstAnimation() {
+            let animate = JSON.parse(JSON.stringify(this.finished));
+            let counter = animate.length;
+
+            for (let i = 0; i < counter; i++) {
+
+            }
+        }
+        ,
+        chargePoints() {
+            let length = this.finished.length;
+            let cX = 0;
+            let points = []
+            for (let i = 0; i < length; i++) {
+                let process = this.finished.shift();
+                let counter = process.procesado;
+                for (let j = 0; j < counter; j++) {
+                    let data = {
+                        label: `${process.id}`,
+                        y: i,
+                        x: cX,
+                        x2: cX + 1
+                    }
+                    points.push(data);
+                    cX++;
+                }
+            }
+            return points;
+        },
         async start() {
+            this.clearChart();
             await this.sort();
             this.priorityScheduling(this.procesosBack);
-            let inicio = 0;
-            let counter = 0;
-            const mySeries = this.chart.series[0];
             let categories = [];
-
             this.finished.forEach(element => {
                 categories.push(`${element.id}`);
             });
+            this.chart.yAxis[0].setCategories(categories);
 
-            this.chart.yAxis[0].setCategories(categories);    
+            let mySeries = this.chart.series[0];
+            let data = this.chargePoints();
+            let last = 0;
+            let lengthData = data.length;
 
-            this.finished.forEach(proceso => {
-                setTimeout(() => {
-                    mySeries.addPoint({
-                        label: `${proceso.id}`,
-                        y: counter,
-                        x: inicio + proceso.tiempo,
-                        x2: inicio + proceso.procesado
-                    });
-                    counter++;
-                    inicio += proceso.procesado;
-                }, 1000);
-            });
+            let interval = setInterval(() => {
+                if (this.bursted) {
+                    if (lengthData > last) {
+                        let dataRow = data.shift();
+                        let row = document.querySelectorAll(`#${dataRow.label} > td > input`);
+
+                        row.forEach(e => {
+                            e.classList.add("focusedColor");
+                            setTimeout(() => {
+                                e.classList.remove("focusedColor");
+                            }, 500);
+                        });
+
+                        mySeries.addPoint(dataRow);
+                    } else {
+                        interval.clearInterval;
+                    }
+                    last++;
+                }
+            }, 800);
+            this.bursted = false;
         }
     }
 });
 app.mount("#app");
-
-//modified

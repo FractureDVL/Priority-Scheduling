@@ -179,7 +179,6 @@ i.fa {
     margin: auto;
 }
 
-
 .page-title {
 
     position: relative;
@@ -204,15 +203,14 @@ i.fa {
 }
 
 .table tbody tr:nth-of-type(even) input {
-    background-color: aliceblue;
+    background-color: rgba(240, 248, 255, 0);
 }
 
 table {
-    border: 2px solid aliceblue;
+    border: 2px solid rgba(240, 248, 255, 0);
 }
 
 .github-cat {
-    margin-top: 20px;
     box-sizing: content-box;
     height: 100px;
     position: absolute;
@@ -235,8 +233,7 @@ table {
 }
 
 .octo-body {
-    width: 200px;
-    height: 100px
+    width: 100px;
 }
 
 .result {
@@ -368,19 +365,43 @@ td.td-cell, th.td-cell {
     font-family: "Avenir Next W01", "Proxima Nova W01", "Rubik", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-.scroll::-webkit-scrollbar-track
-{
-	border: 1px solid black;
-	background-color: #F5F5F5;
+.scroll::-webkit-scrollbar-track {
+    border-radius: 20px;
+    background-color: #263159;
 }
 
-.scroll::-webkit-scrollbar
-{
-	width: 10px;
-	background-color: #F5F5F5;
+.scroll::-webkit-scrollbar {
+    width: 10px;
+    background-color: #F5F5F5;
 }
 
-.scroll::-webkit-scrollbar-thumb
-{
-	background-color: #000000;	
+.scroll::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+    background-color: #263159;
+}
+
+tr {
+    transition: background-position-x 1s;
+}
+
+tr.animated {
+    transform: scale(1.1);
+    transition: background-position-x: 100%;
+    background-color: rgb(255, 132, 132);
+}
+
+tr.animated-reverse {
+    transition: background-position-x: 0%;
+}
+
+.ufps {
+    position: absolute;
+    top: 0px;
+    left: 25px;
+    height: 100px;
+}
+
+.focusedColor {
+    transform: scale(1.2);
+    background-color: rgb(255, 136, 136);
 }

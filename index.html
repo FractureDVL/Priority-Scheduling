@@ -14,12 +14,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
         integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <title>Prority Scheduling</title>
+    <title>Priority Scheduling</title>
 </head>
 
 <body class="scroll">
     <header class="header">
-        <h1 class="page-title">Programación Prioritaria</h1>
+        <img class="ufps" alt="Logo Ing Sistemas UFPS"src="https://ingsistemas.cloud.ufps.edu.co/rsc/img/logo_ingsistemas_vertical_invertido.png" alt="">
+        <h1 class="page-title">Prority Scheduling Algorithm</h1>
         <svg class="github-cat" viewBox="0 0 250 250" aria-hidden="true"
             style="fill: rgb(100, 206, 170); color: rgb(25, 45, 56); position: absolute; top: 0px; border: 0px; right: 0px;">
             <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
@@ -36,14 +37,14 @@
     <div id="app" class="cont">
         <div class="child">
             <div class="data-container">
-                <h3 class="title"  v-on:click="chargeExample()">Procesos en cola</h3>
+                <h3 class="title"  v-on:click="chargeExample()">Process in Queue</h3>
                 <div class="table-container">
                     <table class="table" id="table">
                         <thead>
-                            <th class="td-cell">Id proceso</th>
-                            <th class="td-cell">Prioridad</th>
-                            <th class="td-cell">Tiempo(ms)</th>
-                            <th class="td-cell">Llegada</th>
+                            <th class="td-cell">Process ID</th>
+                            <th class="td-cell">Priority</th>
+                            <th class="td-cell">Burst Time</th>
+                            <th class="td-cell">Arrival Time</th>
                         </thead>
                         <tbody id="datat">
                             <tr :id="proceso.id" class="zoom" v-for="proceso in procesosView">
@@ -69,11 +70,11 @@
                             <tr class="newProcess zoom" v-if="show || this.procesosView != null">
                                 <td class="td-cell"><input class="cell" type="text" v-bind:placeholder="newId" readonly>
                                 </td>
-                                <td class="td-cell"><input class="input-new cell" type="number" placeholder="Prioridad"
+                                <td class="td-cell"><input class="input-new cell" type="number" placeholder="Priority"
                                         required></td>
-                                <td class="td-cell"><input class="input-new cell" type="number" placeholder="Tiempo"
+                                <td class="td-cell"><input class="input-new cell" type="number" placeholder="Time"
                                         required></td>
-                                <td class="td-cell"><input class="input-new cell" type="number" placeholder="Llegada"
+                                <td class="td-cell"><input class="input-new cell" type="number" placeholder="Arrival"
                                         required></td>
                             </tr>
                         </tbody>
@@ -90,7 +91,7 @@
                     </div> -->
                 </div>
                 <div class="timer-cont ">
-                    <label class="timer" for="tiempo">Tiempo</label>
+                    <label class="timer" for="tiempo">Wasted time</label>
                     <input class="timer-input cell" type="number" name="tiempo" v-bind:value="this.tiempoTotal">
                 </div>
             </div>
