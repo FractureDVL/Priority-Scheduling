@@ -144,7 +144,7 @@ const app = Vue.createApp({
             const number = /[0-9]*/;
             let valid = true;
             for (let i = 0; i < arr.length; i++) {
-                if (!(number.test(arr[i]) && arr[i] != '' && arr.length !== 3)) {
+                if (!(number.test(arr[i])) || arr[i] === "") {
                     valid = false;
                 }
             }
@@ -164,6 +164,9 @@ const app = Vue.createApp({
                 this.isSorted = false;
                 this.bursted = false;
                 this.isShowingData = true;
+                nuevo[0].value = '';
+                nuevo[1].value = '';
+                nuevo[2].value = '';
             }
             else {
                 Swal.fire({
@@ -172,10 +175,6 @@ const app = Vue.createApp({
                     text: 'Rellene todos los campos.',
                 });
             }
-            nuevo[0].value = '';
-            nuevo[1].value = '';
-            nuevo[2].value = '';
-
         },
         //Ordenamiento 1.Prioridad, luego 2.llegada (Por buburja)
         bubbleSort(procesos, tamanio) {
