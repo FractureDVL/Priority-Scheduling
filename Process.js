@@ -144,7 +144,7 @@ const app = Vue.createApp({
             const number = /[0-9]*/;
             let valid = true;
             for (let i = 0; i < arr.length; i++) {
-                if (!(number.test(arr[0]) && arr[0] != '')) {
+                if (!(number.test(arr[i]) && arr[i] != '' && arr.length !== 3)) {
                     valid = false;
                 }
             }
