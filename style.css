@@ -15,10 +15,19 @@
 }
 
 .header {
+    display: flex;
+    justify-content: space-between;
     position: relative;
     padding: 20px;
     background-color: #181D31;
 }
+.header-cont{margin: 5px;
+}
+.header-cont > img {
+    box-sizing: content-box;
+    height: 100%;
+}
+
 
 .title {
     text-align: center;
@@ -155,9 +164,19 @@ i.fa {
     text-align: center;
     position: absolute;
     bottom: 0;
-    left: 40%;
+    left: 27%;
     margin-bottom: -150px;
 }
+
+.big-button.clear-button {
+    width: 3em;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    left: 53%;
+    margin-bottom: -150px;
+}
+
 
 .timer {
     display: block;
@@ -206,14 +225,11 @@ i.fa {
     background-color: rgba(240, 248, 255, 0);
 }
 
-table td > input{
+table td>input {
     border: 2px solid rgba(240, 248, 255, 0);
-    font-size: 1.1em;    
+    font-size: 1.1em;
 }
 
-input.cell{
-    
-}
 .github-cat {
     box-sizing: content-box;
     height: 100px;
@@ -402,4 +418,3 @@ tr {
 .focusedColorRowInput {
     background-color: rgba(233, 146, 255, 0.726) !important;
 }
-

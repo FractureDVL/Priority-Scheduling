@@ -10,6 +10,7 @@ class Proceso {
         this.finished = finished;
     }
 }
+
 const app = Vue.createApp({
     data() {
         return {
@@ -53,6 +54,48 @@ const app = Vue.createApp({
         }
     },
     methods: {
+        clear() {
+            this.procesosBack = []
+            this.procesosView = []
+        },
+        //Agrega una fila con nuevo un nuevo procesos ***
+        add() {
+            var nuevo = document.querySelectorAll('tr.newProcess input.input-new');
+            this.show = this.show ? '' : this.show = true;
+            var nproc = [nuevo[0].value, nuevo[1].value, nuevo[2].value];
+            //Clases
+            console.log(this.validArrivalTime(nproc));
+            if (this.validArrivalTime(nproc)) {
+                if (this.valid(nproc)) {
+                    let a = new Proceso(this.newId, nuevo[2].valueAsNumber, nuevo[1].valueAsNumber, nuevo[0].valueAsNumber, 0, false, false, false);
+                    let b = new Proceso(this.newId, nuevo[2].valueAsNumber, nuevo[1].valueAsNumber, nuevo[0].valueAsNumber, 0, false, false, false);
+
+                    this.procesosView.push(a);
+                    this.procesosBack.push(b);
+                    this.isSorted = false;
+                    this.bursted = false;
+                    this.isShowingData = true;
+
+                    nuevo[0].value = '';
+                    nuevo[1].value = '';
+                    nuevo[2].value = '';
+                }
+                else {
+                    Swal.fire({
+                        icon: '',
+                        title: 'Oops...',
+                        text: 'Rellene todos los campos.',
+                    });
+                }
+            } else {
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Este valor de llegada ya esta en uso.',
+                });
+            }
+        },
         mountChart() {
             let newChart = new Highcharts.chart('container', {
                 chart: {
@@ -121,7 +164,7 @@ const app = Vue.createApp({
                 new Proceso('P2', 1, 7, 4, 0, false, false, false), // 3
                 new Proceso('P3', 6, 3, 5, 0, false, false, false), // 2
                 new Proceso('P4', 0, 7, 4, 0, false, false, false), // 1
-                new Proceso('P5', 6, 3, 3, 0, false, false, false)  // 5
+                new Proceso('P5', 3, 3, 3, 0, false, false, false)  // 5
             ];
             this.procesosBack = JSON.parse(JSON.stringify(example));
             this.procesosView = JSON.parse(JSON.stringify(example));
@@ -135,38 +178,24 @@ const app = Vue.createApp({
                     valid = false;
                 }
             }
+
             return valid;
         },
-        //Agrega una fila con nuevo un nuevo procesos ***
-        add() {
-            var nuevo = document.querySelectorAll('tr.newProcess input.input-new');
-            this.show = this.show ? '' : this.show = true;
-            var nproc = [nuevo[0].value, nuevo[1].value, nuevo[2].value];
-            //Clases
-            if (this.valid(nproc)) {
-                let a = new Proceso(this.newId, nuevo[2].valueAsNumber, nuevo[1].valueAsNumber, nuevo[0].valueAsNumber, 0, false, false, false);
-                let b = new Proceso(this.newId, nuevo[2].valueAsNumber, nuevo[1].valueAsNumber, nuevo[0].valueAsNumber, 0, false, false, false);
-                this.procesosView.push(a);
-                this.procesosBack.push(b);
-                this.isSorted = false;
-                this.bursted = false;
-                this.isShowingData = true;
-                nuevo[0].value = '';
-                nuevo[1].value = '';
-                nuevo[2].value = '';
+        validArrivalTime(arr) {
+            let valid = true;
+            for (let i = 0; i < this.procesosBack.length; i++) {
+                console.log(arr[1] + "  " + this.procesosBack[i].llegada);
+                if (arr[2] == this.procesosBack[i].llegada) {
+                    valid = false;
+                }
             }
-            else {
-                Swal.fire({
-                    icon: '',
-                    title: 'Oops...',
-                    text: 'Rellene todos los campos.',
-                });
-            }
+            return valid;
         },
         //Ordenamiento 1.Prioridad, luego 2.llegada (Por buburja)
         bubbleSort(procesos, tamanio) {
             if (tamanio == 1) return;
             let contador = 0;
+
             for (let i = 0; i < tamanio - 1; i++) {
                 if (procesos[i].prioridad > procesos[i + 1].prioridad) {
                     let temp = procesos[i];
@@ -198,26 +227,26 @@ const app = Vue.createApp({
                 let insert = document.querySelector(`#${i}`);
                 let inputs = document.querySelectorAll(`#${i} > td > input, #${j} > td > input`);
 
-                outside.classList.add("moveRowOut");
-                insert.classList.add("moveRowOut");
+                // outside.classList.add("moveRowOut");
+                // insert.classList.add("moveRowOut");
 
                 for (const input of inputs) {
-                    input.classList.add('see');
+                    // input.classList.add('see');
                 }
                 setTimeout(() => {
                     for (const input of inputs) {
                         input.classList.remove('see');
                     }
-                    let temp = this.procesosView[x];
+                    // let temp = this.procesosView[x];
 
-                    this.procesosView[x] = this.procesosView[y];
-                    this.procesosView[y] = temp;
-                    outside.classList.remove("moveRowOut");
-                    insert.classList.remove("moveRowOut");
+                    // this.procesosView[x] = this.procesosView[y];
+                    // this.procesosView[y] = temp;
+                    // outside.classList.remove("moveRowOut");
+                    // insert.classList.remove("moveRowOut");
 
                     this.swapAnimationSort(swaps);
-                }, this.TIMER);
-            }, this.TIMER);
+                }, 0);
+            }, 0);
         },
         //Start the sorting if isn't sorted 
         sort() {
@@ -227,6 +256,7 @@ const app = Vue.createApp({
                 } else {
                     this.bubbleSort(this.procesosBack, this.procesosBack.length);
                     this.swapAnimationSort(this.swaps);
+                    this.bursted = true;
 
                 }
                 return this.isSorted = true;
@@ -295,8 +325,15 @@ const app = Vue.createApp({
                 text: 'Los procesos ya se encuentran ordenados',
             });
         },
-        getPause() {
-
+        switchMode() {
+            if (this.noPreEmptive === true) {
+                this.preEmptive = false;
+                this.noPreEmptive = true;
+            }
+            if(this.preEmptive === true){
+                this.noPreEmptive = false;
+                this.preEmptive = true;
+            }
         },
         // Ejecuta un proceso disminuyendo el valor de tiempo recursivo
         ejecutarRecursivo(_actual) {
@@ -306,7 +343,6 @@ const app = Vue.createApp({
                 this.ejecutarRecursivo(_actual);
             } else {
                 //push a charDataFormat
-
                 _actual.finished = true;
                 this.finished.push(_actual);
                 this.hasNext = false;
@@ -339,12 +375,11 @@ const app = Vue.createApp({
             for (let i = 0; i < counter; i++) {
 
             }
-        }
-        ,
+        },
         chargePoints() {
             let length = this.finished.length;
             let cX = 0;
-            let points = []
+            let points = [];
             for (let i = 0; i < length; i++) {
                 let process = this.finished.shift();
                 let counter = process.procesado;
@@ -372,7 +407,7 @@ const app = Vue.createApp({
             });
             return index;
         },
-        async start() {
+        async startNoPreemptive() {
             this.clearChart();
             await this.sort();
             this.priorityScheduling(this.procesosBack);
@@ -398,7 +433,6 @@ const app = Vue.createApp({
 
                         let rowInput = document.querySelectorAll(`#${dataRow.label} > td:nth-child(3) > input`)[0];
                         rowInput.classList.add("focusedColorRowInput");
-
                         setTimeout(() => {
                             let index = this.indexProcess(this.procesosView, dataRow.label);
                             this.procesosView[index].tiempo -= 1;
@@ -406,7 +440,7 @@ const app = Vue.createApp({
                             row.classList.remove("focusedColorRow");
                             rowInput.classList.remove("focusedColorRowInput");
                         }, 500);
-
+                        
                         mySeries.addPoint(dataRow);
                     } else {
                         interval.clearInterval;
