@@ -14,24 +14,11 @@ const app = Vue.createApp({
     data() {
         return {
             //Procesos del usuario
-            procesosView: [
-                //id, llegada, tiempo, prioridad, procesado, stoped, running, finished
-                // new Proceso('P1', 2, 7, 5, 0, false, false, false), // 4
-                // new Proceso('P2', 1, 7, 4, 0, false, false, false), // 3
-                // new Proceso('P3', 6, 3, 5, 0, false, false, false), // 2
-                // new Proceso('P4', 0, 7, 4, 0, false, false, false), // 1
-                // new Proceso('P5', 6, 3, 3, 0, false, false, false)  // 5
-            ],
+            procesosView: [],
             editing: false,
             show: false,
             //Procesos ordernados en sort
-            procesosBack: [
-                // new Proceso('P1', 2, 7, 5, 0, false, false, false), // 4
-                // new Proceso('P2', 1, 7, 4, 0, false, false, false), // 3
-                // new Proceso('P3', 6, 3, 5, 0, false, false, false), // 2
-                // new Proceso('P4', 0, 7, 4, 0, false, false, false), // 1
-                // new Proceso('P5', 6, 3, 3, 0, false, false, false)  // 5
-            ],
+            procesosBack: [],
             //Procesos ejecutando
             running: [],
             //Procesos pausados
@@ -299,8 +286,7 @@ const app = Vue.createApp({
             this.pointData.splice(0, this.pointData.length);
             this.finished.splice(0, this.finished.length);
             this.mountChart();
-        }
-        ,
+        },
         //Show alert if the process are sorted (using isSorted variable)
         alertSorted() {
             Swal.fire({
@@ -309,12 +295,14 @@ const app = Vue.createApp({
                 text: 'Los procesos ya se encuentran ordenados',
             });
         },
+        getPause() {
+
+        },
         // Ejecuta un proceso disminuyendo el valor de tiempo recursivo
         ejecutarRecursivo(_actual) {
             if (_actual.tiempo > 0) {
                 _actual.tiempo = _actual.tiempo - 1;
                 _actual.procesado = _actual.procesado + 1;
-                this.tiempoTotal += 1;
                 this.ejecutarRecursivo(_actual);
             } else {
                 //push a charDataFormat
@@ -373,14 +361,27 @@ const app = Vue.createApp({
             }
             return points;
         },
+        indexProcess(arr, str) {
+            let index = 0;
+            let c = 0;
+            arr.forEach(element => {
+                if (str === element.id) {
+                    index = c;
+                }
+                c++;
+            });
+            return index;
+        },
         async start() {
             this.clearChart();
             await this.sort();
             this.priorityScheduling(this.procesosBack);
             let categories = [];
+
             this.finished.forEach(element => {
                 categories.push(`${element.id}`);
             });
+
             this.chart.yAxis[0].setCategories(categories);
 
             let mySeries = this.chart.series[0];
@@ -392,14 +393,19 @@ const app = Vue.createApp({
                 if (this.bursted) {
                     if (lengthData > last) {
                         let dataRow = data.shift();
-                        let row = document.querySelectorAll(`#${dataRow.label} > td > input`);
+                        let row = document.querySelector(`#${dataRow.label}`);
+                        row.classList.add("focusedColorRow");
 
-                        row.forEach(e => {
-                            e.classList.add("focusedColor");
-                            setTimeout(() => {
-                                e.classList.remove("focusedColor");
-                            }, 500);
-                        });
+                        let rowInput = document.querySelectorAll(`#${dataRow.label} > td:nth-child(3) > input`)[0];
+                        rowInput.classList.add("focusedColorRowInput");
+
+                        setTimeout(() => {
+                            let index = this.indexProcess(this.procesosView, dataRow.label);
+                            this.procesosView[index].tiempo -= 1;
+                            this.tiempoTotal++;
+                            row.classList.remove("focusedColorRow");
+                            rowInput.classList.remove("focusedColorRowInput");
+                        }, 500);
 
                         mySeries.addPoint(dataRow);
                     } else {
@@ -412,4 +418,5 @@ const app = Vue.createApp({
         }
     }
 });
+
 app.mount("#app");
