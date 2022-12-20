@@ -109,7 +109,7 @@ const app = Vue.createApp({
                     text: 'Finished processes',
                     style: {
                         color: "#ffff",
-                        fontSize: 30
+                        fontSize: 20
                     }
                 },
                 credits: {

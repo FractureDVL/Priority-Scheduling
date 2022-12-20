@@ -10,7 +10,7 @@
 .cont {
     display: flex;
     padding: 0;
-    height: 87vh;
+    height: 86vh;
     justify-content: center;
 }
 
@@ -18,12 +18,15 @@
     display: flex;
     justify-content: space-between;
     position: relative;
-    padding: 20px;
+    padding: 7px;
     background-color: #181D31;
 }
-.header-cont{margin: 5px;
+
+.header-cont {
+    margin: 5px;
 }
-.header-cont > img {
+
+.header-cont>img {
     box-sizing: content-box;
     height: 100%;
 }
@@ -32,7 +35,7 @@
 .title {
     text-align: center;
     color: #181D31;
-    font-size: 1.6em;
+    font-size: 1.5em;
     font-weight: 500;
     margin: 0;
     padding: 0.8em 0;
@@ -160,20 +163,20 @@ i.fa {
 }
 
 .big-button.play-button {
-    width: 3em;
+    width: 2em;
     text-align: center;
     position: absolute;
     bottom: 0;
-    left: 27%;
+    left: 32%;
     margin-bottom: -150px;
 }
 
 .big-button.clear-button {
-    width: 3em;
+    width: 2em;
     text-align: center;
     position: absolute;
     bottom: 0;
-    left: 53%;
+    left: 54%;
     margin-bottom: -150px;
 }
 
@@ -232,7 +235,7 @@ table td>input {
 
 .github-cat {
     box-sizing: content-box;
-    height: 100px;
+    height: 70px;
     position: absolute;
     right: 0;
     top: 0;
@@ -408,7 +411,7 @@ tr {
     position: absolute;
     top: 0px;
     left: 25px;
-    height: 100px;
+    height: 25px;
 }
 
 .focusedColorRow {
@@ -417,4 +420,85 @@ tr {
 
 .focusedColorRowInput {
     background-color: rgba(233, 146, 255, 0.726) !important;
+}
+
+/*Collabsible*/
+.accordion>input[type="checkbox"] {
+    position: absolute;
+    left: -100vw;
+}
+
+.accordion .content {
+    overflow-y: hidden;
+    height: 0;
+    transition: height 0.3s ease;
+    text-align: start;
+}
+
+.accordion>input[type="checkbox"]:checked~.content {
+    height: auto;
+    overflow: visible;
+}
+
+.accordion label {
+    display: block;
+}
+
+/*
+   Styling
+  */
+
+.accordion > input[type="checkbox"]:checked~.content {
+    padding: 15px;
+    border: 1px solid #e8e8e8;
+    border-top: 0;
+}
+
+.accordion .handle {
+    margin: 0;
+    font-size: 1.125em;
+    line-height: 1.2em;
+}
+
+.accordion label {
+    color: #333;
+    cursor: pointer;
+    font-weight: normal;
+    padding: 5px;
+    background: #263159;
+    color: #e8e8e8;
+    border-radius: 0.3em;
+}
+
+.accordion label:hover,
+.accordion label:focus {
+    background: #263159;
+}
+
+.accordion .handle label:before {
+    font-family: 'fontawesome';
+    content: "\f054";
+    display: inline-block;
+    margin-right: 10px;
+    font-size: .58em;
+    line-height: 1.556em;
+    vertical-align: middle;
+}
+
+.accordion>input[type="checkbox"]:checked~.handle label:before {
+    content: "\f078";
+}
+
+.accordion {
+    max-width: 65em;
+}
+
+.accordion p:last-child {
+    margin-bottom: 0;
+}
+
+.child-info{
+    font-size:1em;
+    max-width: 500px;
+    text-align: center;
 }

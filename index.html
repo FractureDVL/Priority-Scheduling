@@ -29,8 +29,7 @@
         </div>
         <div class="header-cont">
             <a href="https://github.com/FractureDVL/Priority-Scheduling">
-                <svg class="github-cat" viewBox="0 0 250 250"
-                    aria-hidden="true "
+                <svg class="github-cat" viewBox="0 0 250 250" aria-hidden="true "
                     style="fill: rgb(100, 206, 170); color: rgb(25, 45, 56); position: absolute; top: 0px; border: 0px; right: 0px;">
                     <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
                     <path
@@ -44,6 +43,7 @@
                 </svg></a>
         </div>
     </header>
+
     <div id="app" class="cont">
         <div class="child">
             <div class="data-container">
@@ -98,15 +98,27 @@
                     <div class="big-button clear-button" v-on:click="clear()">
                         <i class="fa-solid fa fa-rotate-right"></i>
                     </div>
-                    <!-- Boton de animacion -->
-                    <!-- <div class="big-button play-button-remove" v-on:click="moveOn()">
-                        <i class="fa-solid fa fa-play"></i>
-                    </div> -->
                 </div>
                 <div class="timer-cont ">
                     <label class="timer" for="tiempo">Elapse time</label>
                     <input class="timer-input cell" type="number" name="tiempo" v-bind:value="this.tiempoTotal"
                         readonly>
+                </div>
+            </div>
+            <div class="child child-info accordion">
+                <input type="checkbox" name="collapse2" id="handle2">
+                <h2 class="handle">
+                    <label for="handle2">What's Priority Scheduling</label>
+                </h2>
+                <div class="content">
+                    <p> Priority Scheduling is a method of scheduling processes that is based on priority. In this
+                        algorithm,
+                        the scheduler selects the tasks to work as per the priority.
+                        The processes with higher priority should be carried out first, whereas jobs with equal
+                        priorities are
+                        carried out on a round-robin or FCFS basis. Priority depends upon memory requirements, time
+                        requirements, etc.
+                    </p>
                 </div>
             </div>
         </div>
@@ -118,9 +130,6 @@
             </div>
         </div>
     </div>
-    <hr>
-
-
     <!--VueJS-->
     <script src="https://unpkg.com/vue@next"></script>
     <!--SweetAlert-->
