@@ -43,7 +43,22 @@
                 </svg></a>
         </div>
     </header>
-
+    <div class="child child-info accordion">
+        <input type="checkbox" name="collapse2" id="handle2">
+        <h2 class="handle">
+            <label for="handle2">What's Priority Scheduling</label>
+        </h2>
+        <div class="content">
+            <p> Priority Scheduling is a method of scheduling processes that is based on priority. In this
+                algorithm,
+                the scheduler selects the tasks to work as per the priority.
+                The processes with higher priority should be carried out first, whereas jobs with equal
+                priorities are
+                carried out on a round-robin or FCFS basis. Priority depends upon memory requirements, time
+                requirements, etc.
+            </p>
+        </div>
+    </div>
     <div id="app" class="cont">
         <div class="child">
             <div class="data-container">
@@ -105,22 +120,7 @@
                         readonly>
                 </div>
             </div>
-            <div class="child child-info accordion">
-                <input type="checkbox" name="collapse2" id="handle2">
-                <h2 class="handle">
-                    <label for="handle2">What's Priority Scheduling</label>
-                </h2>
-                <div class="content">
-                    <p> Priority Scheduling is a method of scheduling processes that is based on priority. In this
-                        algorithm,
-                        the scheduler selects the tasks to work as per the priority.
-                        The processes with higher priority should be carried out first, whereas jobs with equal
-                        priorities are
-                        carried out on a round-robin or FCFS basis. Priority depends upon memory requirements, time
-                        requirements, etc.
-                    </p>
-                </div>
-            </div>
+
         </div>
         <!-- Gannt chart -->
         <div class="child gantt">
@@ -129,6 +129,8 @@
                 <div id="container"></div>
             </div>
         </div>
+        <!-- info text -->
+
     </div>
     <!--VueJS-->
     <script src="https://unpkg.com/vue@next"></script>

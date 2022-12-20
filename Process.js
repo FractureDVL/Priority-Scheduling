@@ -408,6 +408,7 @@ const app = Vue.createApp({
             return index;
         },
         async startNoPreemptive() {
+            this.tiempoTotal = 0;
             this.clearChart();
             await this.sort();
             this.priorityScheduling(this.procesosBack);
